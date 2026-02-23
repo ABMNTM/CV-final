@@ -24,6 +24,7 @@ class ImageEnhancer:
         clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
         l_enhanced = clahe.apply(l)
         return self.__get_bgr(l_enhanced, a, b)
-    
-    
-    
+
+    def gamma(self, img):
+        """ img is BGR """
+        l, a, b = self.__get_lab(img)
