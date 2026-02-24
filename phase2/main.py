@@ -4,27 +4,32 @@ from scipy.stats import cumfreq
 
 
 class ImageEnhancer:
-    def __get_lab(self, img):
-        lab_img = cv.cvtColor(img, cv.COLOR_BGR2LAB)
-        return cv.split(lab_img)
+    def __get_hsv(self, img):
+        hsv_img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+        return cv.split(hsv_img)
     
-    def __get_bgr(self, l, a, b):
-        enhanced_lab = cv.merge((l, a, b))
-        return cv.cvtColor(enhanced_lab, cv.COLOR_LAB2BGR)
+    def __get_bgr(self, h, s, v):
+        hsv_img = cv.merge((h, s, v))
+        return cv.cvtColor(hsv_img, cv.COLOR_HSV2BGR)
 
     def histogram_equalization(self, img):
         """ img is BGR """
-        l, a, b = self.__get_lab(img)
-        l_enhanced = cv.equalizeHist(l)
-        return self.__get_bgr(l_enhanced, a, b)
+        h, s, v = self.__get_hsv(img)
+        v_enhanced = cv.equalizeHist(v)
+        return self.__get_bgr(h, s, v_enhanced)
 
     def CLAHE(self, img):
         """ img is BGR """
-        l, a, b = self.__get_lab(img)
+        h, s, v = self.__get_hsv(img)
         clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
-        l_enhanced = clahe.apply(l)
-        return self.__get_bgr(l_enhanced, a, b)
+        v_enhanced = clahe.apply(v)
+        return self.__get_bgr(h, s, v_enhanced)
 
     def gamma(self, img):
         """ img is BGR """
-        l, a, b = self.__get_lab(img)
+        h, s, v = self.__get_hsv(img)
+        gamma = 0.5
+        alpha = 1
+        v_enhanced = alpha * np.power(v / 255.0, gamma) * 255.0
+        v_enhanced = np.clip(v_enhanced, 0, 255).astype(np.uint8)
+        return self.__get_bgr(h, s, v_enhanced)
